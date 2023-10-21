@@ -1,4 +1,3 @@
-// telegram-bot.service.ts
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { Telegraf } from 'telegraf';
@@ -13,29 +12,63 @@ export class TelegramBotService {
   }
 
   private setupBot(): void {
-    this.bot.start((ctx) => ctx.reply('Olá, eu sou o seu Bot do Telegram!'));
+    const humorCommands = ['/feliz', '/triste', '/bravo', '/medo'];
+    const commandList = humorCommands.join('\n');
+
+    this.bot.start((ctx) =>
+      ctx.reply(
+        `Olá, eu sou seu Bot Pessoal do Telgram!\nComo você está se sentindo hoje?\nComandos disponíveis:\n${commandList}`,
+      ),
+    );
     this.bot.on('text', (ctx) => this.handleIncomingMessage(ctx));
   }
 
   private async handleIncomingMessage(ctx: any): Promise<void> {
     const message = ctx.message.text;
     const chatId = ctx.chat.id;
+    const username = ctx.chat.username;
+
+    const humorCommands = ['/feliz', '/triste', '/bravo', '/medo'];
+    const commandList = humorCommands.join('\n');
+
+    if (humorCommands.includes(message)) {
+      let response = '';
+
+      switch (message) {
+        case '/feliz':
+          response = 'Que bom! Fico feliz em saber!';
+          break;
+        case '/triste':
+          response = 'Sinto muito em ouvir isso. Espero que melhore em breve.';
+          break;
+        case '/bravo':
+          response = 'Calma, tudo vai se resolver. Respire fundo!';
+          break;
+        case '/medo':
+          response = 'Não se preocupe, estou aqui para te ajudar!';
+          break;
+      }
+
+      ctx.reply(response);
+    } else {
+      ctx.reply(
+        `Como você está se sentindo hoje?\nComandos disponíveis:\n${commandList}`,
+      );
+    }
 
     console.log(ctx.message);
 
-    // Handle incoming message logic here
-    console.log(`Mensagem recebida: ${message} de chatID: ${chatId}`);
+    console.log(
+      `Mensagem recebida: ${message} de chatID: ${chatId} user: ${username}`,
+    );
 
-    // Save the message to the database
     await this.prisma.message.create({
       data: {
         chatId,
         text: message,
+        username,
       },
     });
-
-    // Reply to the user
-    ctx.reply('Recebemos sua mensagem!');
   }
 
   public async launch(): Promise<void> {
@@ -43,8 +76,16 @@ export class TelegramBotService {
     console.log('Telegram bot started');
   }
 
-  public async sendMessage(chatId: number, message: string): Promise<void> {
-    await this.bot.telegram.sendMessage(chatId, message);
+  public async sendMessage(chatId: number, message: string) {
+    const msg = await this.prisma.message.findFirst({
+      where: { chatId },
+    });
+
+    if (msg) {
+      await this.bot.telegram.sendMessage(chatId, message);
+    }
+
+    return 'deu ruim';
   }
 
   public async handleWebhookUpdate(update): Promise<void> {
