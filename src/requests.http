@@ -1,0 +1,10 @@
+@apiurl = "http://localhost:3000/telegram-bot/";
+
+###
+POST {{apiurl}}webhook HTTP/1.1
+Content-Type: application/json
+
+ {
+  "chatID": "5746907442",
+  "message": "aoooobbbbaaaa!"
+ }
