@@ -52,7 +52,7 @@ export class TelegramBotService {
       ctx.reply(response);
     } else {
       ctx.reply(
-        `Como você está se sentindo hoje?\nComandos disponíveis:\n${commandList}`,
+        `Olá! No momento só conheço os comandos:\n${commandList}\nPor favor digite algum dos comandos acima.\n\nEstamos trabalhando em novas atualizações para trazer outros comandos em breve!`,
       );
     }
 
@@ -77,15 +77,28 @@ export class TelegramBotService {
   }
 
   public async sendMessage(chatId: number, message: string) {
-    const msg = await this.prisma.message.findFirst({
-      where: { chatId },
-    });
+    try {
+      const msg = await this.prisma.message.findFirst({
+        where: { chatId },
+      });
 
-    if (msg) {
-      await this.bot.telegram.sendMessage(chatId, message);
+      if (msg) {
+        await this.bot.telegram.sendMessage(chatId, message);
+        await this.prisma.message.create({
+          data: {
+            chatId,
+            text: message,
+            username: 'bot',
+          },
+        });
+        return 'Message sent successfully';
+      }
+
+      return 'Chat not found';
+    } catch (error) {
+      console.error(error);
+      return 'An unexpected error occurred';
     }
-
-    return 'deu ruim';
   }
 
   public async handleWebhookUpdate(update): Promise<void> {
