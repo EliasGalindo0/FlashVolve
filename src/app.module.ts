@@ -4,9 +4,10 @@ import { AppService } from './app.service';
 import { TelegramBotModule } from './telegram-bot.module';
 import { APP_FILTER } from '@nestjs/core';
 import { ErrorMiddleware } from './middlewares/error.middleware';
+import { LoginModule } from './login/login.module';
 
 @Module({
-  imports: [TelegramBotModule],
+  imports: [TelegramBotModule, LoginModule],
   controllers: [AppController],
   providers: [
     AppService,
