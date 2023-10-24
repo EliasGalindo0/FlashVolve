@@ -10,8 +10,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+}
+
 model Message {
-  id        Int      @id @default(autoincrement())
+  id        String   @unique @default(uuid())
   chatId    BigInt
   text      String
   username  String
