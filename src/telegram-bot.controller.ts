@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Param } from '@nestjs/common';
+import { Controller, Post, Body, Param, Get } from '@nestjs/common';
 import { TelegramBotService } from './telegram-bot.service';
 
 @Controller('telegram-bot')
@@ -17,5 +17,10 @@ export class TelegramBotController {
   @Post('webhook')
   async handleWebhookUpdate(@Body() body: any): Promise<void> {
     await this.telegramBotService.handleWebhookUpdate(body);
+  }
+
+  @Get('messages')
+  async getMessages(): Promise<void> {
+    await this.telegramBotService.getMessages();
   }
 }

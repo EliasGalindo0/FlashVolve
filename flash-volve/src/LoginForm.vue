@@ -14,31 +14,39 @@
         <div class="flex items-center justify-center">
           <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Entrar</button>
         </div>
+        <p v-if="errorLogin" class="text-red-500 text-sm mt-2 text-center font-bold">{{ errorLogin }}</p>
       </form>
     </div>
   </div>
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   data() {
     return {
       username: '',
-      password: ''
+      password: '',
+      errorLogin: '',
     };
   },
   methods: {
-    login() {
-      // Lógica para autenticar o usuário
-      const login = true;
-    if (login) {
-      this.$router.push({ name: 'AdminPanel' }); // Redireciona para a página do AdminPanel
-    } else {
-      // Exibe uma mensagem de erro ou lida com o login inválido
-    }
-      console.log('Usuário:', this.username);
-      console.log('Senha:', this.password);
-      // Você pode implementar a lógica de autenticação de acordo com a sua necessidade
+    async login() {
+      try {
+        const login = await axios.post('http://localhost:3000/login');
+
+        if (login.ok) {
+          this.$router.push({ name: 'AdminPanel' });
+        } else {
+          this.errorLogin = 'Login ou senha incorretos. Por favor verifique e tente novamente.';
+        }
+        console.log('Usuário:', this.username);
+        console.log('Senha:', this.password);
+      } catch (error) {
+        console.error('Erro ao efetuar Login', error);
+        this.errorLogin = 'Login ou senha incorretos. Por favor verifique e tente novamente.';
+      }
     }
   }
 };
