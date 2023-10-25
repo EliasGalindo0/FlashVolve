@@ -177,5 +177,3 @@ npm run serve
 ## Conclusion
 
 Congratulations! You now have a fullstack application for managing received messages and sending messages via a Telegram bot. The backend is built with NestJS, the database is managed using Docker Compose with PostgreSQL, and the frontend is developed using Vue.js. Feel free to explore and enhance the application based on your requirements.
-
-Note: Make sure to replace `<repository-url>` with the actual URL of your repository.
