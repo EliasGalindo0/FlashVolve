@@ -1,38 +1,41 @@
 <template>
   <div class="container mx-auto p-4">
-  <h1 class="text-3xl font-bold mb-4 text-center">Painel Administrativo</h1>
+    <h1 class="text-3xl font-bold mb-4 text-center">Painel Administrativo</h1>
 
-  <!-- Tabela de mensagens recebidas -->
-  <h2 class="text-xl font-bold mb-2">Mensagens Recebidas</h2>
-  <div class="-mx-4 mb-4 overflow-x-auto">
-    <table class="w-full whitespace-no-wrap bg-white rounded-lg overflow-hidden sm:shadow-lg my-5">
-      <thead class="text-white bg-blue-500">
-        <tr class="flex justify-between">
-          <th class="py-3 px-4 uppercase font-bold text-sm">Remetente</th>
-          <th class="py-3 px-4 uppercase font-bold text-sm">Mensagem</th>
-          <th class="py-3 px-4 uppercase font-bold text-sm">Data</th>
-        </tr>
-      </thead>
-      <tbody class="text-gray-700">
-        <tr v-for="message in receivedMessages" :key="message.id">
-          <td class="py-3 px-4">{{ message.sender }}</td>
-          <td class="py-3 px-4">{{ message.content }}</td>
-          <td class="py-3 px-4">{{ message.date }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    <!-- Tabela de mensagens recebidas -->
+    <div class="-mx-4 mb-4 overflow-x-auto">
+      <h2 class="text-xl font-bold">Mensagens Recebidas</h2>
+      <table class="w-full table-auto bg-white rounded-lg shadow-lg my-5">
+        <thead class="text-white bg-blue-500">
+          <tr>
+            <th class="py-3 px-4 uppercase font-bold text-sm">Remetente</th>
+            <th class="py-3 px-4 uppercase font-bold text-sm">Mensagem</th>
+            <th class="py-3 px-4 uppercase font-bold text-sm">ChatId</th>
+            <th class="py-3 px-4 uppercase font-bold text-sm">Ações</th>
+          </tr>
+        </thead>
+        <tbody class="text-gray-700">
+          <tr class="" v-for="message in receivedMessages" :key="message.id">
+            <td class="py-3 px-4 w-[20%] text-center">{{ message.username }}</td>
+            <td class="py-3 px-4 w-[50%] text-center">{{ message.text }}</td>
+            <td class="py-3 px-4 w-[20%] text-center">{{ message.chatId }}</td>
+            <td class="py-3 px-4 w-[10%] text-center">
+              <button @click="selectChatId(message.chatId)" class="bg-blue-500 hover:bg-blue-600 focus:bg-gray-800 text-white font-bold p-2 rounded focus:outline-none focus:shadow-outline">Selecionar Id</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-  <!-- Campo para enviar mensagens -->
-  <h2 class="text-xl font-bold mt-4 mb-2">Enviar Mensagem</h2>
-    <div class="flex flex-wrap mb-6">
-      <div class="w-full md:w-full px-3 mb-6 md:mb-0">
-        <input type="text" v-model="newMessage" class="bg-gray-100 rounded border border-gray-400 focus:outline-none focus:border-blue-500 text-base py-2 px-4 block w-full appearance-none leading-normal" placeholder="Digite sua mensagem">
-        <button @click="sendMessage" class="bg-blue-500 hover:bg-blue-700 mt-2 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Enviar</button>
-      </div>
+    <!-- Campo para enviar mensagens -->
+    <div class="flex flex-col justify-center items-center mb-6">
+    <h2 class="text-xl font-bold mt-4 mb-2">Enviar Mensagem</h2>
+        <input type="text" v-model="newMessage" class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 mb-2 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500">
+        <button @click="sendMessage" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Enviar</button>
     </div>
   </div>
 </template>
+
 
 <script>
 import axios from 'axios';
@@ -40,25 +43,36 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      receivedMessages: [], // Array para armazenar as mensagens recebidas
-      newMessage: '' // Variável para armazenar a nova mensagem a ser enviada
+      receivedMessages: [],
+      newMessage: '',
+      chatId: '',
+      selectedChatId: '', 
     };
   },
   methods: {
-    async sendMessage(chatId) {
+    selectChatId(chatId) {
+      this.selectedChatId = chatId;
+    },
+
+    async sendMessage() {
+      console.log("🚀 ~ file: AdminPanel.vue:49 ~ sendMessage ~ chatId:", this.chatId)
       try {
-        const response = await axios.post(`http://localhost:3000/telegram-bot/sendMessage/${chatId}`, {
-          message: this.newMessage
-        });
-        console.log('Mensagem enviada:', response.data);
-        this.newMessage = ''; // Limpa o campo de mensagem após o envio
-      } catch (error) {
-        console.error('Erro ao enviar a mensagem:', error);
-      }
-    }, 
+        if (this.selectedChatId) {
+          const response = await axios.post(`http://localhost:3000/telegram-bot/sendMessage/${this.selectedChatId}`, {
+            message: this.newMessage
+          });
+          console.log('Mensagem enviada:', response.data);
+          this.newMessage = ''; // Limpa o campo de mensagem após o envio
+          }
+        } catch (error) {
+          console.error('Erro ao enviar a mensagem:', error);
+        }
+    },
+
     async fetchMessages() {
       try {
-        const response = await axios.get('http://localhost:3000/telegram-bot/messages');
+        const response = await axios.get('http://localhost:3000/message');
+        console.log("🚀 ~ file: AdminPanel.vue:62 ~ fetchMessages ~ response:", response)
         this.receivedMessages = response.data;
       } catch (error) {
         console.error('Erro ao buscar as mensagens:', error);

@@ -11,3 +11,7 @@ Content-Type: application/json
 ###
 POST http://localhost:3000/telegram-bot/webhook
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+
+####
+GET http://localhost:3000/messages
+Content-Type: application/json

@@ -101,11 +101,7 @@ export class TelegramBotService {
     }
   }
 
-  public async handleWebhookUpdate(update): Promise<void> {
+  public async handleWebhookUpdate(update: any): Promise<void> {
     await this.bot.handleUpdate(update);
-  }
-
-  public async getMessages(): Promise<void> {
-    await this.prisma.message.findMany();
   }
 }
