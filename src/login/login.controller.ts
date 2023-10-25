@@ -19,6 +19,10 @@ export class LoginController {
   @Post()
   async login(@Body() createLoginDto: CreateLoginDto) {
     const user = await this.loginService.validateUser(createLoginDto);
+    console.log(
+      '🚀 ~ file: login.controller.ts:21 ~ LoginController ~ login ~ createLoginDto:',
+      createLoginDto,
+    );
 
     if (!user) {
       throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
@@ -31,7 +35,7 @@ export class LoginController {
     const accessToken = this.jwtService.sign(payload);
 
     if (accessToken) {
-      return { ...userWithoutPassword };
+      return { ...userWithoutPassword, accessToken };
     }
 
     return null;
