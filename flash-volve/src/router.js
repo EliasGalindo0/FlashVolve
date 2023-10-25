@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import AdminPanel from './components/AdminPanel.vue';
-import LoginForm from './LoginForm.vue';
+import AdminPanel from './components/AdminPanel';
+import LoginForm from './components/LoginForm';
+import AuthService from './services/AuthService';
 
 const routes = [
   {
@@ -18,14 +19,17 @@ const routes = [
 
 const router = createRouter({
   history: createWebHistory(),
+  base: '/',
   routes,
 });
 
-// Verifica se o usuário está autenticado antes de acessar as rotas protegidas
 router.beforeEach((to, from, next) => {
-  const isAuthenticated = true; /* Lógica para verificar se o usuário está autenticado */
-  if (to.meta.requiresAuth && !isAuthenticated) {
-    next({ name: 'LoginForm' }); // Redireciona para a página de login se não estiver autenticado
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    if (!AuthService.isAuthenticated()) {
+      next({ name: 'LoginForm' });
+    } else {
+      next();
+    }
   } else {
     next();
   }

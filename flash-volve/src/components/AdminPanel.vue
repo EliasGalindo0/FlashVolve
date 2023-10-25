@@ -4,7 +4,10 @@
 
     <!-- Tabela de mensagens recebidas -->
     <div class="-mx-4 mb-4 overflow-x-auto">
-      <h2 class="text-xl font-bold">Mensagens Recebidas</h2>
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold ">Mensagens Recebidas</h2>
+        <button @click="handleLogout()" class="bg-green-500 hover:bg-green-600 focus:bg-gray-800 text-white font-bold p-2 ml- rounded focus:outline-none focus:shadow-outline">Logout</button>
+      </div>
       <table class="w-full table-auto bg-white rounded-lg shadow-lg my-5">
         <thead class="text-white bg-blue-500">
           <tr>
@@ -39,6 +42,7 @@
 
 <script>
 import axios from 'axios';
+import AuthService from '../services/AuthService';
 
 export default {
   data() {
@@ -46,7 +50,7 @@ export default {
       receivedMessages: [],
       newMessage: '',
       chatId: '',
-      selectedChatId: '', 
+      selectedChatId: '',
     };
   },
   methods: {
@@ -55,7 +59,6 @@ export default {
     },
 
     async sendMessage() {
-      console.log("🚀 ~ file: AdminPanel.vue:49 ~ sendMessage ~ chatId:", this.chatId)
       try {
         if (this.selectedChatId) {
           const response = await axios.post(`http://localhost:3000/telegram-bot/sendMessage/${this.selectedChatId}`, {
@@ -77,7 +80,12 @@ export default {
       } catch (error) {
         console.error('Erro ao buscar as mensagens:', error);
       }
-    }
+    },
+
+    handleLogout() {
+      AuthService.logout();
+      this.$router.push({ name: 'LoginForm' });
+    },
   },
   mounted() {
     this.fetchMessages();
